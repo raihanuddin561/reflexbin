@@ -4,11 +4,11 @@ Api for reflexbin
 
 - init project
 - phase 1:
-  -- feautres:
-    --- todo
+  - feautres:
+    - todo
   
-  -- technologies:
-    --- todo
+  - technologies:
+    - todo
 
-  -- task lisk:
-    --- todo
+  - task lisk:
+    - todo
