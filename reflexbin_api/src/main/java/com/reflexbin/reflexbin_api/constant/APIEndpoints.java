@@ -6,5 +6,5 @@ package com.reflexbin.reflexbin_api.constant;
 public class APIEndpoints {
     public static final String REVIEW = "/stg/api/p/review";
     public static final String REVIEW_ADD = "/add";
-    public static final String REVIEW_GET = "/stg/api/p/review/get/{review_id}";
+    public static final String REVIEW_GET = "/get/{reviewId}";
 }

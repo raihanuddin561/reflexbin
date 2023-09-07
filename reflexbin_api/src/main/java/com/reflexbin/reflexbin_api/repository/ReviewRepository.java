@@ -15,7 +15,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /**
      * Method for find review by reviewId
      *
-     * @param reviewId
+     * @param id
      * @return
      */
     Optional<Review> findById(Long id);

@@ -5,6 +5,8 @@ import com.reflexbin.reflexbin_api.dto.response.ReviewResponse;
 import com.reflexbin.reflexbin_api.model.Review;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
+
 /**
  * dto mapper/converter class for Review
  */
@@ -21,7 +23,7 @@ public class ReviewConverter {
                 .userId(1L)//custom for now
                 .rating(reviewRequest.getRating())
                 .message(reviewRequest.getMessage())
-                //.createdAt()
+                .createdAt(ZonedDateTime.now())
                 .build();
     }
 

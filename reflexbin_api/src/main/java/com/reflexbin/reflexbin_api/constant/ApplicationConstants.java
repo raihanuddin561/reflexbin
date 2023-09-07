@@ -9,5 +9,6 @@ public class ApplicationConstants {
     public static final String CREATED_SUCCESS_CODE = "201";
     public static final String CREATED_MSG = "Created";
     public static final String UPDATED_MSG = "Updated";
+    public static final String SUCCESS_MSG = "Success";
 
 }
