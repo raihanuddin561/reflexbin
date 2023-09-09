@@ -4,33 +4,31 @@ import com.reflexbin.reflexbin_api.constant.APIEndpoints;
 import com.reflexbin.reflexbin_api.constant.ApplicationConstants;
 import com.reflexbin.reflexbin_api.constant.enums.ResponseType;
 import com.reflexbin.reflexbin_api.dto.BaseResponse;
-import com.reflexbin.reflexbin_api.dto.request.ReviewRequest;
-import com.reflexbin.reflexbin_api.dto.response.ReviewResponse;
-import com.reflexbin.reflexbin_api.service.ReviewService;
+import com.reflexbin.reflexbin_api.dto.request.CompanyCategoryRequest;
+import com.reflexbin.reflexbin_api.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
 /**
- * RestController class for Review
+ * RestController class for Company and CompanyCategory
  */
 @RestController
-@RequestMapping(value = APIEndpoints.REVIEW)
 @RequiredArgsConstructor
-public class ReviewController {
-
-    private final ReviewService reviewService;
+@RequestMapping(APIEndpoints.COMPANY)
+public class CompanyController {
+    private final CompanyService companyService;
 
     /**
-     * Add review
+     * Create company category
      *
-     * @param reviewRequest
-     * @return BaseResponse
+     * @param companyCategoryRequest
+     * @return
      */
-    @PostMapping(APIEndpoints.REVIEW_ADD)
-    public BaseResponse addReview(@RequestBody ReviewRequest reviewRequest) {
-        reviewService.saveReview(reviewRequest);
+    @PostMapping(APIEndpoints.COMPANY_CATEGORY_CREATE)
+    public BaseResponse createCompanyCategory(@RequestBody CompanyCategoryRequest companyCategoryRequest) {
+        companyService.createCompanyCategory(companyCategoryRequest);
         return BaseResponse.builder()
                 .responseType(ResponseType.RESULT)
                 .message(Collections.singleton(ApplicationConstants.CREATED_MSG))
@@ -39,16 +37,15 @@ public class ReviewController {
     }
 
     /**
-     * Get review by reviewId
-     * @param reviewId
-     * @return BaseResponse
+     * Get all company categories
+     *
+     * @return
      */
-    @GetMapping(APIEndpoints.REVIEW_GET)
-    public BaseResponse getReview(@PathVariable Long reviewId) {
-        ReviewResponse reviewResponse = reviewService.getReviewByReviewId(reviewId);
+    @GetMapping(APIEndpoints.COMPANY_CATEGORY_GET_ALL)
+    public BaseResponse getAllCompanyCategories() {
         return BaseResponse.builder()
                 .responseType(ResponseType.RESULT)
-                .result(reviewResponse)
+                .result(companyService.getAllCompanyCategories())
                 .code(ApplicationConstants.SUCCESS_CODE)
                 .build();
     }

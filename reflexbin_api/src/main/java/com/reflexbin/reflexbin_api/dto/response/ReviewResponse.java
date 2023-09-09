@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewResponse {
+    private Long reviewId;
     private Integer rating;
     private String message;
     private ZonedDateTime createdAt;

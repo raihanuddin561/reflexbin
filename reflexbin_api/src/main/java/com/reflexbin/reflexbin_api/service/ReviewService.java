@@ -10,5 +10,5 @@ public interface ReviewService {
 
     void saveReview(ReviewRequest reviewRequest);
 
-    ReviewResponse getReviewById(Long id);
+    ReviewResponse getReviewByReviewId(Long reviewId);
 }

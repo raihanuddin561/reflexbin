@@ -35,6 +35,7 @@ public class ReviewConverter {
      */
     public ReviewResponse entityToResponse(Review review) {
         return ReviewResponse.builder()
+                .reviewId(review.getId())
                 .rating(review.getRating())
                 .message(review.getMessage())
                 .createdAt(review.getCreatedAt())

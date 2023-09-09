@@ -6,6 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.ZonedDateTime;
+
+/**
+ * Entity class for Company
+ */
 @Entity
 @Table(name = "_company")
 @Data
@@ -35,4 +40,10 @@ public class Company {
 
     @Column(name = "review_id")
     private Long reviewId;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
 }

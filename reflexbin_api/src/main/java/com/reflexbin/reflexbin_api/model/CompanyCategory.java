@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Entity class for CompanyCategory
+ */
 @Entity
 @Table(name = "_company_category")
 @Data

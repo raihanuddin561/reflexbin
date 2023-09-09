@@ -9,6 +9,7 @@ import com.reflexbin.reflexbin_api.service.converter.ReviewConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -34,13 +35,13 @@ public class ReviewServiceImpl implements ReviewService {
     /**
      * Method for retrieving review by reviewId
      *
-     * @param id
+     * @param reviewId
      * @return ReviewResponse
      */
     @Override
-    public ReviewResponse getReviewById(Long id) {
+    public ReviewResponse getReviewByReviewId(Long reviewId) {
         // todo: need to work on exception
-        Optional<Review> reviewOptional = reviewRepository.findById(id);
+        Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
         if (reviewOptional.isPresent()) {
             return reviewConverter.entityToResponse(reviewOptional.get());
         } else {
