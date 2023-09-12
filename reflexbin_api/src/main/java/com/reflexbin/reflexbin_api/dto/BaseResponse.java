@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -13,7 +14,9 @@ import java.util.Collection;
 @Builder
 @Data
 @AllArgsConstructor
-public class BaseResponse {
+public class BaseResponse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private ResponseType responseType;
 
