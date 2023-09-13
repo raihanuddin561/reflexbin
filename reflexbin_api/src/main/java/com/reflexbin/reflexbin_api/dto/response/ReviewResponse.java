@@ -2,6 +2,7 @@ package com.reflexbin.reflexbin_api.dto.response;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 /**
@@ -12,7 +13,8 @@ import java.time.ZonedDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewResponse {
+public class ReviewResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Long reviewId;
     private Integer rating;
     private String message;
