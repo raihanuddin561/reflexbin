@@ -5,11 +5,10 @@ import com.reflexbin.reflexbin_api.dto.response.ReviewResponse;
 import com.reflexbin.reflexbin_api.model.Review;
 import com.reflexbin.reflexbin_api.repository.ReviewRepository;
 import com.reflexbin.reflexbin_api.service.ReviewService;
-import com.reflexbin.reflexbin_api.service.converter.ReviewConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 /**
@@ -19,7 +18,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
-    private final ReviewConverter reviewConverter;
 
     /**
      * Method for saving reviewRequest
@@ -29,7 +27,13 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     public void saveReview(ReviewRequest reviewRequest) {
-        reviewRepository.save(reviewConverter.requestToEntity(reviewRequest));
+        Review review = Review.builder()
+                .userId(1L)//custom for now
+                .rating(reviewRequest.getRating())
+                .message(reviewRequest.getMessage())
+                .createdAt(ZonedDateTime.now())
+                .build();
+        reviewRepository.save(review);
     }
 
     /**
@@ -43,7 +47,13 @@ public class ReviewServiceImpl implements ReviewService {
         // todo: need to work on exception
         Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
         if (reviewOptional.isPresent()) {
-            return reviewConverter.entityToResponse(reviewOptional.get());
+            Review review = reviewOptional.get();
+            return ReviewResponse.builder()
+                    .reviewId(review.getId())
+                    .rating(review.getRating())
+                    .message(review.getMessage())
+                    .createdAt(review.getCreatedAt())
+                    .build();
         } else {
             return null;
         }
