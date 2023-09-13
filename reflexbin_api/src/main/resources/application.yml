@@ -10,7 +10,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        formate_sql: true
+        format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
