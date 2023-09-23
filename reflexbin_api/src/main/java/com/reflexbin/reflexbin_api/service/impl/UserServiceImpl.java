@@ -34,6 +34,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         UserEntity user = userRepository.findByEmail(username).orElseThrow(
                 () -> new UsernameNotFoundException("Username not found")
         );
-        return new User(user.getEmail(), user.getPassword(), true, true, true, true, new ArrayList<>());
+        return new User(user.getEmail(), user.getPassword(),
+                true, true, true,
+                true, new ArrayList<>());
     }
 }

@@ -53,9 +53,9 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
             email = requestMap.get("email");
             password = requestMap.get("password");
             log.info("Login with: " + email);
-            authenticationManager
+            return authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(email, password));
-        } catch (IOException e) {
+        } catch (Exception e) {
             writeErrorResponse(e, response);
         }
         return null;

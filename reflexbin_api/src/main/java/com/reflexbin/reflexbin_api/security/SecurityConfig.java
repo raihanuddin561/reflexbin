@@ -1,6 +1,8 @@
 package com.reflexbin.reflexbin_api.security;
 
 import com.reflexbin.reflexbin_api.service.JWTService;
+import com.reflexbin.reflexbin_api.service.UserService;
+import com.reflexbin.reflexbin_api.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Security config class
@@ -21,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JWTService jwtService;
+    private final UserServiceImpl userService;
 
     /**
      * authenticationManager bean
@@ -49,6 +53,7 @@ public class SecurityConfig {
                     auth.anyRequest().permitAll();
                 })
                 .addFilter(new CustomAuthFilter(authenticationManager, jwtService))
+                .addFilterBefore(new CustomAuthorizationFilter(jwtService,userService), UsernamePasswordAuthenticationFilter.class)
         ;
         return http.build();
     }

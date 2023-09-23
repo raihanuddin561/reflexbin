@@ -11,9 +11,11 @@ public class ApplicationConstants {
     public static final String UPDATED_MSG = "Updated";
     public static final String SUCCESS_MSG = "Success";
 
-    public static final String SECURITY_KEY = "mysecret";
+    public static final String SECURITY_KEY = "FA78845C75E658F5FF95B1AF9E555";
     public static final String CONTENT_TYPE_JSON = "application/json";
     public static final String STATUS_FAILED = "FAILED";
     public static final Object MESSAGE = "message";
     public static final Object BAD_CREDENTIALS = "Bad Credentials!";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String BEARER = "Bearer ";
 }

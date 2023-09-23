@@ -2,6 +2,7 @@ package com.reflexbin.reflexbin_api.service.impl;
 
 import com.reflexbin.reflexbin_api.constant.ApplicationConstants;
 import com.reflexbin.reflexbin_api.service.JWTService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -12,6 +13,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * JWT Service class
@@ -29,6 +31,41 @@ public class JWTServiceImpl implements JWTService {
     @Override
     public String generateToken(String userName) {
         return generateToken(new HashMap<>(), userName);
+    }
+
+    /**
+     * extract username
+     * @param token String
+     * @return String
+     */
+    @Override
+    public String extractUsername(String token) {
+        return extractClaim(token,Claims::getSubject);
+    }
+
+    /**
+     * extracting claims
+     * @param token String
+     * @param claimsResolver Function
+     * @return T
+     */
+    public <T> T extractClaim(String token, Function<Claims,T> claimsResolver){
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    /**
+     * extract all claims method
+     * @param token String
+     * @return Claims
+     */
+    private Claims extractAllClaims(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigninKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
     }
 
     /**
