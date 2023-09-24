@@ -1,6 +1,7 @@
 package com.reflexbin.reflexbin_api.exceptions;
 
 import com.reflexbin.reflexbin_api.model.ErrorModel;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -57,6 +58,32 @@ public class AppExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorModel> usernameNotFoundException(
             UsernameNotFoundException exception) {
+        setErrorModel(STATUS_FAILED, Map.of("code",
+                HttpStatus.BAD_REQUEST.value(), MESSAGE,
+                exception.getLocalizedMessage()));
+        return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<ErrorModel> userAlreadyExistException(
+            UserAlreadyExistException exception) {
+        setErrorModel(STATUS_FAILED, Map.of("code",
+                HttpStatus.BAD_REQUEST.value(), MESSAGE,
+                exception.getLocalizedMessage()));
+        return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorModel> expiredJwtException(
+            ExpiredJwtException exception) {
+        setErrorModel(STATUS_FAILED, Map.of("code",
+                HttpStatus.BAD_REQUEST.value(), MESSAGE,
+                exception.getLocalizedMessage()));
+        return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorModel> anyOtherException(
+            Exception exception) {
         setErrorModel(STATUS_FAILED, Map.of("code",
                 HttpStatus.BAD_REQUEST.value(), MESSAGE,
                 exception.getLocalizedMessage()));

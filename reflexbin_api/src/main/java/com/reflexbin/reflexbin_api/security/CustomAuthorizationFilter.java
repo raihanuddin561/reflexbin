@@ -1,14 +1,18 @@
 package com.reflexbin.reflexbin_api.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reflexbin.reflexbin_api.constant.ApplicationConstants;
+import com.reflexbin.reflexbin_api.model.ErrorModel;
 import com.reflexbin.reflexbin_api.service.JWTService;
 import com.reflexbin.reflexbin_api.service.impl.UserServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +20,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * CustomAuthorizationFilter for authentication/authorization by token
@@ -38,7 +43,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         }
         String token = header.substring(7);
         log.info("Extracting user from token...");
-        String username = jwtService.extractUsername(token);
+        String username = null;
+        try {
+            username=jwtService.extractUsername(token);
+        }catch (ExpiredJwtException exception){
+            writeErrorResponse(exception,response);
+            return;
+        }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             log.info("Extracted username.");
             UserDetails userDetails = this.userServiceImpl.loadUserByUsername(username);
@@ -55,5 +66,25 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             log.info("AuthToken prepared.");
         }
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * writeErrorResponse method
+     *
+     * @param e        any exception
+     * @param response HttpServletResponse
+     */
+    private void writeErrorResponse(Exception e, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        ErrorModel errorModel = ErrorModel.builder()
+                .status(ApplicationConstants.STATUS_FAILED)
+                .error(Map.of("code", HttpStatus.BAD_REQUEST.value(), ApplicationConstants.MESSAGE, e.getLocalizedMessage()))
+                .build();
+        response.setContentType(ApplicationConstants.CONTENT_TYPE_JSON);
+        try {
+            new ObjectMapper().writeValue(response.getOutputStream(), errorModel);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

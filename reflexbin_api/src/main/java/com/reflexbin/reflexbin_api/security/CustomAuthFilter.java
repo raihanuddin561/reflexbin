@@ -1,10 +1,14 @@
 package com.reflexbin.reflexbin_api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reflexbin.reflexbin_api.SpringApplicationContext;
 import com.reflexbin.reflexbin_api.constant.ApplicationConstants;
 import com.reflexbin.reflexbin_api.model.ErrorModel;
 import com.reflexbin.reflexbin_api.model.LoginResponse;
+import com.reflexbin.reflexbin_api.model.UserEntity;
 import com.reflexbin.reflexbin_api.service.JWTService;
+import com.reflexbin.reflexbin_api.service.UserService;
+import com.reflexbin.reflexbin_api.service.impl.UserServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

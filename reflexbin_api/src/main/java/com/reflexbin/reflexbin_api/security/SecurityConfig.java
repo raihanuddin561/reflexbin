@@ -1,11 +1,11 @@
 package com.reflexbin.reflexbin_api.security;
 
 import com.reflexbin.reflexbin_api.service.JWTService;
-import com.reflexbin.reflexbin_api.service.UserService;
 import com.reflexbin.reflexbin_api.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -50,10 +50,14 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.anyRequest().permitAll();
+                    auth
+                            .requestMatchers(HttpMethod.POST,"/user/create","/login").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/user").hasAnyRole("USER")
+                            .requestMatchers(HttpMethod.GET, "/admin").hasAnyRole("ADMIN")
+                            .anyRequest().authenticated();
                 })
                 .addFilter(new CustomAuthFilter(authenticationManager, jwtService))
-                .addFilterBefore(new CustomAuthorizationFilter(jwtService,userService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomAuthorizationFilter(jwtService, userService), UsernamePasswordAuthenticationFilter.class)
         ;
         return http.build();
     }

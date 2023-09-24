@@ -3,6 +3,7 @@ package com.reflexbin.reflexbin_api.service.impl;
 import com.reflexbin.reflexbin_api.constant.ApplicationConstants;
 import com.reflexbin.reflexbin_api.service.JWTService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -80,7 +81,7 @@ public class JWTServiceImpl implements JWTService {
                 .setClaims(claims)
                 .setSubject(userName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*60*24))
                 .signWith(getSigninKey(), SignatureAlgorithm.HS256)
                 .compact()
                 ;

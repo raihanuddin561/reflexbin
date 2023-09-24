@@ -10,6 +10,8 @@ import org.hibernate.generator.EventType;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Data
@@ -34,11 +36,22 @@ public class UserEntity implements Serializable {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "role_id")
-    private Long roleId;
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(
+                    name = "user_id",
+                    referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id",
+                    referencedColumnName = "id"
+            )
+    )
+    private Set<UserEntityRole> userRole;
 
-    @Column(name = "user_profile_id")
-    private Long userProfileId;
+    @OneToOne
+    private UserProfile userProfile;
 
     private boolean active;
 
