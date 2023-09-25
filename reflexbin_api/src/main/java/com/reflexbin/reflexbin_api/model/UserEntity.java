@@ -1,26 +1,21 @@
 package com.reflexbin.reflexbin_api.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Generated;
 import org.hibernate.generator.EventType;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Set;
 
 @Entity
-@Data
+@Table(name = "users")
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,19 +31,19 @@ public class UserEntity implements Serializable {
     @Column(name = "last_name")
     private String lastName;
 
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
-            name = "user_role",
+            name = "users_roles",
             joinColumns = @JoinColumn(
-                    name = "user_id",
+                    name = "users_id",
                     referencedColumnName = "id"
             ),
             inverseJoinColumns = @JoinColumn(
-                    name = "role_id",
+                    name = "roles_id",
                     referencedColumnName = "id"
             )
     )
-    private Set<UserEntityRole> userRole;
+    private Collection<RoleEntity> roles;
 
     @OneToOne
     private UserProfile userProfile;

@@ -45,9 +45,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         log.info("Extracting user from token...");
         String username = null;
         try {
-            username=jwtService.extractUsername(token);
-        }catch (ExpiredJwtException exception){
-            writeErrorResponse(exception,response);
+            username = jwtService.extractUsername(token);
+        } catch (ExpiredJwtException exception) {
+            writeErrorResponse(exception, response);
             return;
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

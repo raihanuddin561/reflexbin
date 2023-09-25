@@ -4,11 +4,11 @@ import com.reflexbin.reflexbin_api.constant.ApplicationConstants;
 import com.reflexbin.reflexbin_api.dto.request.UserRequestModel;
 import com.reflexbin.reflexbin_api.dto.response.UserResponseModel;
 import com.reflexbin.reflexbin_api.exceptions.UserAlreadyExistException;
+import com.reflexbin.reflexbin_api.model.RoleEntity;
 import com.reflexbin.reflexbin_api.model.UserEntity;
-import com.reflexbin.reflexbin_api.model.UserEntityRole;
 import com.reflexbin.reflexbin_api.model.enums.Role;
+import com.reflexbin.reflexbin_api.repository.RoleRepository;
 import com.reflexbin.reflexbin_api.repository.UserRepository;
-import com.reflexbin.reflexbin_api.repository.UserRoleRepository;
 import com.reflexbin.reflexbin_api.service.UserService;
 import com.reflexbin.reflexbin_api.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Userservice class
@@ -37,7 +39,7 @@ import java.util.*;
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
-    private final UserRoleRepository userRoleRepository;
+    private final RoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -49,11 +51,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("Loading user by username: {}",username);
+        log.info("Loading user by username: {}", username);
         UserEntity user = getUserByEmail(username);
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        for(UserEntityRole role:user.getUserRole()){
-            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_"+role.getRole()));
+        for (RoleEntity role : user.getRoles()) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(role.getRole()));
         }
         return new User(user.getEmail(), user.getPassword(),
                 user.isActive(), true, true,
@@ -62,6 +64,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     /**
      * get user by email
+     *
      * @param username pass email
      * @return UserEntity
      */
@@ -74,6 +77,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     /**
      * create user with user information
+     *
      * @param userRequestModel user information model
      * @return ResponseEntity
      */
@@ -81,25 +85,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ResponseEntity<UserResponseModel> createUser(UserRequestModel userRequestModel) {
         log.info("creating user...");
         Optional<UserEntity> userEntity = userRepository.findByEmail(userRequestModel.getEmail());
-        if(userEntity.isPresent()) throw new UserAlreadyExistException(ApplicationConstants.USER_ALREADY_EXIST);
+        if (userEntity.isPresent()) throw new UserAlreadyExistException(ApplicationConstants.USER_ALREADY_EXIST);
         ModelMapper modelMapper = new ModelMapper();
-        UserEntity user = modelMapper.map(userRequestModel,UserEntity.class);
-        log.info("Preparing role for user {}",userRequestModel.getEmail());
-        UserEntityRole userRole = UserEntityRole.builder()
-                .role(Role.USER.name())
+        UserEntity user = modelMapper.map(userRequestModel, UserEntity.class);
+        log.info("Preparing role for user {}", userRequestModel.getEmail());
+        RoleEntity userRole = RoleEntity.builder()
+                .role(Role.ROLE_USER.name())
                 .build();
-        UserEntityRole userEntityRole = userRoleRepository.findByRole(Role.USER.name()).orElse(
+        RoleEntity userEntityRole = userRoleRepository.findByRole(Role.ROLE_USER.name()).orElse(
                 userRoleRepository.save(userRole)
         );
-        log.info("User role prepared for user: {}",user.getEmail());
+        log.info("User role prepared for user: {}", user.getEmail());
         user.setPassword(passwordEncoder.encode(userRequestModel.getPassword()));
-        user.setUserRole(Set.of(userEntityRole));
+        user.setRoles(List.of(userEntityRole));
         user.setCreatedAt(DateUtils.getCurrentDateTime());
         user.setActive(true);
         user.setLastUpdatedAt(DateUtils.getCurrentDateTime());
         UserEntity savedUser = userRepository.save(user);
-        log.info("Successfully user created for {}",user.getEmail());
-        UserResponseModel userResponseModel = modelMapper.map(savedUser,UserResponseModel.class);
+        log.info("Successfully user created for {}", user.getEmail());
+        UserResponseModel userResponseModel = modelMapper.map(savedUser, UserResponseModel.class);
         return new ResponseEntity<>(userResponseModel, HttpStatus.CREATED);
     }
 }

@@ -72,6 +72,7 @@ public class AppExceptionHandler {
                 exception.getLocalizedMessage()));
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<ErrorModel> expiredJwtException(
             ExpiredJwtException exception) {
