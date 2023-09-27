@@ -1,6 +1,8 @@
 package com.reflexbin.reflexbin_api.service.impl;
 
 import com.reflexbin.reflexbin_api.constant.ApplicationConstants;
+import com.reflexbin.reflexbin_api.constant.enums.ResponseType;
+import com.reflexbin.reflexbin_api.dto.BaseResponse;
 import com.reflexbin.reflexbin_api.dto.request.UserRequestModel;
 import com.reflexbin.reflexbin_api.dto.response.UserResponseModel;
 import com.reflexbin.reflexbin_api.exceptions.UserAlreadyExistException;
@@ -79,10 +81,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * create user with user information
      *
      * @param userRequestModel user information model
-     * @return ResponseEntity
+     * @return ResponseEntity ResponseEntity<BaseResponse>
      */
     @Override
-    public ResponseEntity<UserResponseModel> createUser(UserRequestModel userRequestModel) {
+    public ResponseEntity<BaseResponse> createUser(UserRequestModel userRequestModel) {
         log.info("creating user...");
         Optional<UserEntity> userEntity = userRepository.findByEmail(userRequestModel.getEmail());
         if (userEntity.isPresent()) throw new UserAlreadyExistException(ApplicationConstants.USER_ALREADY_EXIST);
@@ -93,8 +95,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .role(Role.ROLE_USER.name())
                 .build();
         RoleEntity userEntityRole = userRoleRepository.findByRole(Role.ROLE_USER.name()).orElse(
-                userRoleRepository.save(userRole)
+                null
         );
+        if (userEntityRole == null) {
+            userEntityRole = userRoleRepository.save(userRole);
+        }
         log.info("User role prepared for user: {}", user.getEmail());
         user.setPassword(passwordEncoder.encode(userRequestModel.getPassword()));
         user.setRoles(List.of(userEntityRole));
@@ -104,6 +109,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         UserEntity savedUser = userRepository.save(user);
         log.info("Successfully user created for {}", user.getEmail());
         UserResponseModel userResponseModel = modelMapper.map(savedUser, UserResponseModel.class);
-        return new ResponseEntity<>(userResponseModel, HttpStatus.CREATED);
+        BaseResponse finalResponse = BaseResponse.builder()
+                .responseType(ResponseType.SUCCESS)
+                .result(userResponseModel)
+                .code(String.valueOf(HttpStatus.CREATED))
+                .message(List.of("Successfully user created!"))
+                .build();
+        return new ResponseEntity<>(finalResponse, HttpStatus.CREATED);
     }
 }

@@ -2,6 +2,8 @@ package com.reflexbin.reflexbin_api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reflexbin.reflexbin_api.constant.ApplicationConstants;
+import com.reflexbin.reflexbin_api.constant.enums.ResponseType;
+import com.reflexbin.reflexbin_api.dto.BaseResponse;
 import com.reflexbin.reflexbin_api.model.ErrorModel;
 import com.reflexbin.reflexbin_api.model.LoginResponse;
 import com.reflexbin.reflexbin_api.service.JWTService;
@@ -19,6 +21,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,8 +82,14 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
         LoginResponse loginResponse = LoginResponse.builder()
                 .token(token)
                 .build();
+        BaseResponse finalResponse = BaseResponse.builder()
+                .responseType(ResponseType.SUCCESS)
+                .result(loginResponse)
+                .code(String.valueOf(HttpStatus.OK))
+                .message(List.of("Login success!"))
+                .build();
         response.setContentType(ApplicationConstants.CONTENT_TYPE_JSON);
-        new ObjectMapper().writeValue(response.getOutputStream(), loginResponse);
+        new ObjectMapper().writeValue(response.getOutputStream(), finalResponse);
     }
 
     /**
@@ -105,13 +114,15 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
      */
     private void writeErrorResponse(Exception e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        ErrorModel errorModel = ErrorModel.builder()
-                .status(ApplicationConstants.STATUS_FAILED)
-                .error(Map.of("code", HttpStatus.BAD_REQUEST.value(), ApplicationConstants.MESSAGE, e.getLocalizedMessage()))
-                .build();
         response.setContentType(ApplicationConstants.CONTENT_TYPE_JSON);
+        BaseResponse baseResponse = BaseResponse.builder()
+                .error(Map.of(ApplicationConstants.MESSAGE, e.getLocalizedMessage()))
+                .responseType(ResponseType.ERROR)
+                .message(List.of(e.getLocalizedMessage()))
+                .code(String.valueOf(HttpStatus.BAD_REQUEST))
+                .build();
         try {
-            new ObjectMapper().writeValue(response.getOutputStream(), errorModel);
+            new ObjectMapper().writeValue(response.getOutputStream(), baseResponse);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

@@ -1,6 +1,7 @@
 package com.reflexbin.reflexbin_api.exceptions;
 
-import com.reflexbin.reflexbin_api.model.ErrorModel;
+import com.reflexbin.reflexbin_api.constant.enums.ResponseType;
+import com.reflexbin.reflexbin_api.dto.BaseResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.reflexbin.reflexbin_api.constant.ApplicationConstants.MESSAGE;
@@ -21,7 +23,7 @@ import static com.reflexbin.reflexbin_api.constant.ApplicationConstants.STATUS_F
  */
 @ControllerAdvice
 public class AppExceptionHandler {
-    private static ErrorModel errorModel;
+    private static BaseResponse errorModel;
 
     /**
      * setErrorModel method
@@ -29,13 +31,21 @@ public class AppExceptionHandler {
      * @param status String
      * @param error  Map
      */
-    public static void setErrorModel(String status, Map<Object, Object> error) {
-        errorModel = ErrorModel.builder()
-                .status(status)
+    public static void setErrorModel(String status, Map<Object, Object> error,String message) {
+        errorModel = BaseResponse.builder()
+                .code(status)
                 .error(error)
+                .message(List.of(message))
+                .responseType(ResponseType.ERROR)
                 .build();
     }
-
+    public static void setErrorModel(String status, Map<Object, Object> error) {
+        errorModel = BaseResponse.builder()
+                .code(status)
+                .error(error)
+                .responseType(ResponseType.ERROR)
+                .build();
+    }
     /**
      * badCredentialsException
      *
@@ -43,9 +53,9 @@ public class AppExceptionHandler {
      * @return Error ResponseModel
      */
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorModel> badCredentialsException(BadCredentialsException exception) {
-        setErrorModel(STATUS_FAILED, Map.of("code", HttpStatus.BAD_REQUEST.value(),
-                MESSAGE, exception.getLocalizedMessage()));
+    public ResponseEntity<BaseResponse> badCredentialsException(BadCredentialsException exception) {
+        setErrorModel(String.valueOf(HttpStatus.BAD_REQUEST), Map.of(
+                MESSAGE, exception.getLocalizedMessage()),exception.getLocalizedMessage());
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 
@@ -56,37 +66,33 @@ public class AppExceptionHandler {
      * @return Error ResponseModel
      */
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorModel> usernameNotFoundException(
+    public ResponseEntity<BaseResponse> usernameNotFoundException(
             UsernameNotFoundException exception) {
-        setErrorModel(STATUS_FAILED, Map.of("code",
-                HttpStatus.BAD_REQUEST.value(), MESSAGE,
+        setErrorModel(String.valueOf(HttpStatus.BAD_REQUEST), Map.of( MESSAGE,
                 exception.getLocalizedMessage()));
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<ErrorModel> userAlreadyExistException(
+    public ResponseEntity<BaseResponse> userAlreadyExistException(
             UserAlreadyExistException exception) {
-        setErrorModel(STATUS_FAILED, Map.of("code",
-                HttpStatus.BAD_REQUEST.value(), MESSAGE,
+        setErrorModel(String.valueOf(HttpStatus.BAD_REQUEST), Map.of(MESSAGE,
                 exception.getLocalizedMessage()));
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ErrorModel> expiredJwtException(
+    public ResponseEntity<BaseResponse> expiredJwtException(
             ExpiredJwtException exception) {
-        setErrorModel(STATUS_FAILED, Map.of("code",
-                HttpStatus.BAD_REQUEST.value(), MESSAGE,
+        setErrorModel(String.valueOf(HttpStatus.BAD_REQUEST), Map.of( MESSAGE,
                 exception.getLocalizedMessage()));
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorModel> anyOtherException(
+    public ResponseEntity<BaseResponse> anyOtherException(
             Exception exception) {
-        setErrorModel(STATUS_FAILED, Map.of("code",
-                HttpStatus.BAD_REQUEST.value(), MESSAGE,
+        setErrorModel(String.valueOf(HttpStatus.BAD_REQUEST), Map.of( MESSAGE,
                 exception.getLocalizedMessage()));
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }

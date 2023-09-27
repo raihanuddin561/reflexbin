@@ -1,8 +1,8 @@
 package com.reflexbin.reflexbin_api.controller;
 
 import com.reflexbin.reflexbin_api.constant.APIEndpoints;
+import com.reflexbin.reflexbin_api.dto.BaseResponse;
 import com.reflexbin.reflexbin_api.dto.request.UserRequestModel;
-import com.reflexbin.reflexbin_api.dto.response.UserResponseModel;
 import com.reflexbin.reflexbin_api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(APIEndpoints.USER_CREATE)
-    public ResponseEntity<UserResponseModel> createUser(@RequestBody UserRequestModel userRequestModel) {
+    public ResponseEntity<BaseResponse> createUser(@RequestBody UserRequestModel userRequestModel) {
         return userService.createUser(userRequestModel);
     }
 }

@@ -50,8 +50,11 @@ public class InitialUsersSetup {
                 .roles(List.of(roleAdmin))
                 .build();
         UserEntity admin = userRepository.findByEmail(adminUser.getEmail()).orElse(
-                userRepository.save(adminUser)
+                null
         );
+        if(admin==null){
+            admin = userRepository.save(adminUser);
+        }
         log.info("{} has been created as admin user!", admin.getEmail());
     }
 

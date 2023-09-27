@@ -2,8 +2,6 @@ package com.reflexbin.reflexbin_api.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -51,7 +49,6 @@ public class UserEntity {
     private boolean active;
 
     @Column(name = "created_at")
-    @Generated(event = EventType.INSERT)
     private ZonedDateTime createdAt;
 
     @Column(name = "last_updated_at")
