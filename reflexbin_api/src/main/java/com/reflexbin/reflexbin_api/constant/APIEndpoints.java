@@ -4,6 +4,8 @@ package com.reflexbin.reflexbin_api.constant;
  * API endpoint constants
  */
 public class APIEndpoints {
+    public static final String USER = "/user";
+    public static final String USER_CREATE = "/create";
     public static final String COMPANY = "/stg/api/company";
     public static final String COMPANY_CREATE = "/create";
     public static final String COMPANY_CATEGORY_CREATE = "/category/create";

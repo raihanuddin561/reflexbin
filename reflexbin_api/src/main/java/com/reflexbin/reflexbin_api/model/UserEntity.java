@@ -1,24 +1,19 @@
 package com.reflexbin.reflexbin_api.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
+import lombok.*;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 
 @Entity
-@Data
+@Table(name = "users")
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,16 +29,26 @@ public class UserEntity implements Serializable {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "role_id")
-    private Long roleId;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(
+                    name = "users_id",
+                    referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "roles_id",
+                    referencedColumnName = "id"
+            )
+    )
+    private Collection<RoleEntity> roles;
 
-    @Column(name = "user_profile_id")
-    private Long userProfileId;
+    @OneToOne
+    private UserProfile userProfile;
 
     private boolean active;
 
     @Column(name = "created_at")
-    @Generated(event = EventType.INSERT)
     private ZonedDateTime createdAt;
 
     @Column(name = "last_updated_at")
