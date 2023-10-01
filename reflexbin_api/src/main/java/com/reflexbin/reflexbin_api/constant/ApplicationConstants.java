@@ -20,4 +20,5 @@ public class ApplicationConstants {
     public static final Object BAD_CREDENTIALS = "Bad Credentials!";
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER = "Bearer ";
+    public static final String USER_NOT_REGISTERED = "Username not registered!";
 }

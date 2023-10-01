@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserEntity getUserByEmail(String username) {
         return userRepository.findByEmail(username).orElseThrow(
-                () -> new UsernameNotFoundException("Username not registered!")
+                () -> new UsernameNotFoundException(ApplicationConstants.USER_NOT_REGISTERED)
         );
     }
 
@@ -87,16 +87,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ResponseEntity<BaseResponse> createUser(UserRequestModel userRequestModel) {
         log.info("creating user...");
         Optional<UserEntity> userEntity = userRepository.findByEmail(userRequestModel.getEmail());
-        if (userEntity.isPresent()) throw new UserAlreadyExistException(ApplicationConstants.USER_ALREADY_EXIST);
+        if (userEntity.isPresent())
+            throw new UserAlreadyExistException(ApplicationConstants.USER_ALREADY_EXIST);
         ModelMapper modelMapper = new ModelMapper();
         UserEntity user = modelMapper.map(userRequestModel, UserEntity.class);
         log.info("Preparing role for user {}", userRequestModel.getEmail());
         RoleEntity userRole = RoleEntity.builder()
                 .role(Role.ROLE_USER.name())
                 .build();
-        RoleEntity userEntityRole = userRoleRepository.findByRole(Role.ROLE_USER.name()).orElse(
-                null
-        );
+        RoleEntity userEntityRole = userRoleRepository
+                .findByRole(Role.ROLE_USER.name()).orElse(null);
         if (userEntityRole == null) {
             userEntityRole = userRoleRepository.save(userRole);
         }
@@ -108,7 +108,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setLastUpdatedAt(DateUtils.getCurrentDateTime());
         UserEntity savedUser = userRepository.save(user);
         log.info("Successfully user created for {}", user.getEmail());
-        UserResponseModel userResponseModel = modelMapper.map(savedUser, UserResponseModel.class);
+        UserResponseModel userResponseModel = modelMapper
+                .map(savedUser, UserResponseModel.class);
         BaseResponse finalResponse = BaseResponse.builder()
                 .responseType(ResponseType.SUCCESS)
                 .result(userResponseModel)
