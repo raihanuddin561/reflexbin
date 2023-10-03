@@ -61,7 +61,6 @@ class UserControllerTest {
     private BaseResponse baseResponse;
     private UserResponseModel userResponseModel;
     private UserEntity userEntity;
-    private CustomAuthFilter customAuthFilter;
 
     @BeforeEach
     void setUp() {
