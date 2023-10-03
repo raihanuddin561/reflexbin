@@ -6,6 +6,7 @@ import com.reflexbin.reflexbin_api.constant.enums.ResponseType;
 import com.reflexbin.reflexbin_api.dto.BaseResponse;
 import com.reflexbin.reflexbin_api.dto.request.UserRequestModel;
 import com.reflexbin.reflexbin_api.dto.response.UserResponseModel;
+import com.reflexbin.reflexbin_api.exceptions.UserAlreadyExistException;
 import com.reflexbin.reflexbin_api.model.UserEntity;
 import com.reflexbin.reflexbin_api.repository.UserRepository;
 import com.reflexbin.reflexbin_api.security.CustomAuthFilter;
@@ -21,13 +22,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +50,6 @@ class UserControllerTest {
             "}";
     @Autowired
     MockMvc mockMvc;
-    @Autowired
-    private WebApplicationContext context;
-    @Autowired
-    private AuthenticationManager authenticationManager;
     @Autowired
     private JWTService jwtService;
     @MockBean
@@ -97,6 +92,37 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.responseType").value(ResponseType.SUCCESS.name()))
                 .andExpect(jsonPath("$.result.email").value(userResponseModel.getEmail()))
                 .andExpect(jsonPath("$.error").value((Object) null));
+    }
+
+    @Test
+    @DisplayName("Test create user api with existing email")
+    public void testCreateUserAPIWithExistEmail_ThenReturnFailureResponse() throws Exception {
+
+        userResponseModel = UserResponseModel.builder()
+                .email("raihan@gmail.com")
+                .firstName("raihan")
+                .lastName("uddin")
+                .build();
+        baseResponse = BaseResponse.builder()
+                .code(String.valueOf(HttpStatus.CREATED))
+                .error(null)
+                .responseType(ResponseType.SUCCESS)
+                .result(userResponseModel)
+                .build();
+        userEntity = UserEntity.builder()
+                .password("abc")
+                .email("raihan@gmail.com")
+                .lastName("uddin")
+                .active(true)
+                .build();
+        when(userServiceImpl.createUser(any(UserRequestModel.class))).thenThrow(new UserAlreadyExistException(ApplicationConstants.USER_ALREADY_EXIST));
+        mockMvc.perform(post(APIEndpoints.USER + APIEndpoints.USER_CREATE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(USER_REQUEST_BODY))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.responseType").value(ResponseType.ERROR.name()))
+                .andExpect(jsonPath("$.result").value((Object) null))
+                .andExpect(jsonPath("$.error.message").value(ApplicationConstants.USER_ALREADY_EXIST));
     }
 
     @Test
