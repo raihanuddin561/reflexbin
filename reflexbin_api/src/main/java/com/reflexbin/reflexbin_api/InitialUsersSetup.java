@@ -52,10 +52,9 @@ public class InitialUsersSetup {
         UserEntity admin = userRepository.findByEmail(adminUser.getEmail()).orElse(
                 null
         );
-        if(admin==null){
+        if (admin == null) {
             admin = userRepository.save(adminUser);
         }
-        log.info("{} has been created as admin user!", admin.getEmail());
     }
 
     @Transactional
